@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/:id",
+      "destination": "https://make-it-short.onrender.com/:id"
+    }
+  ]
+}

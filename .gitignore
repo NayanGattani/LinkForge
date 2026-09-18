@@ -1,0 +1,11 @@
+backend/bin/
+frontend/node_modules/
+frontend/dist/
+frontend/*.tsbuildinfo
+frontend/vite.config.js
+frontend/vite.config.d.ts
+.env
+.DS_Store
+Thumbs.db
+todo.md
+report.md
