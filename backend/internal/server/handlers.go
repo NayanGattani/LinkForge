@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/NayanGattani/linkforge/backend/internal/shortid"
 	"github.com/go-chi/chi/v5"
-	"github.com/makeitshort/backend/internal/shortid"
 )
 
 const maxURLLength = 2048
@@ -162,17 +162,17 @@ func (s *Server) handleRedirect() http.HandlerFunc {
 		// a redirect needs expiry/click analytics updates.
 		originalURL, redisErr := s.redis.Get(ctx, "link:"+id).Result()
 
-		var row struct {
+		var rows []struct {
 			OriginalURL string     `json:"original_url"`
 			ExpiresAt   *time.Time `json:"expires_at"`
 			ClickCount  int64      `json:"click_count"`
 		}
 
-		err := s.supabase.DB.From("links").Select("original_url,expires_at,click_count").Eq("id", id).Execute(&[]struct {
-			OriginalURL string     `json:"original_url"`
-			ExpiresAt   *time.Time `json:"expires_at"`
-			ClickCount  int64      `json:"click_count"`
-		}{row})
+		err := s.supabase.DB.From("links").
+			Select("original_url,expires_at,click_count").
+			Eq("id", id).
+			Execute(&rows)
+
 		if err != nil {
 			s.logger.Error("failed to query link", "error", err, "id", id)
 			s.writeError(w, http.StatusInternalServerError, "internal server error")
@@ -184,6 +184,7 @@ func (s *Server) handleRedirect() http.HandlerFunc {
 			ExpiresAt   *time.Time
 			ClickCount  int64
 		}
+
 		if len(rows) > 0 {
 			row.OriginalURL = rows[0].OriginalURL
 			row.ExpiresAt = rows[0].ExpiresAt
@@ -210,13 +211,18 @@ func (s *Server) handleRedirect() http.HandlerFunc {
 			"click_count":     row.ClickCount + 1,
 			"last_clicked_at": now.Format(time.RFC3339),
 		}
+
 		var updateResult []interface{}
-		if err := s.supabase.DB.From("links").Update(updated).Eq("id", id).Execute(&updateResult); err != nil {
+		if err := s.supabase.DB.From("links").
+			Update(updated).
+			Eq("id", id).
+			Execute(&updateResult); err != nil {
 			s.logger.Error("failed to update click analytics", "error", err, "id", id)
 		}
 
 		if redisErr != nil || originalURL == "" {
 			ttl := 48 * time.Hour
+
 			if row.ExpiresAt != nil {
 				ttl = time.Until(*row.ExpiresAt)
 				if ttl <= 0 {
@@ -224,8 +230,14 @@ func (s *Server) handleRedirect() http.HandlerFunc {
 					return
 				}
 			}
+
 			go func(cacheID, target string, cacheTTL time.Duration) {
-				if err := s.redis.Set(context.Background(), "link:"+cacheID, target, cacheTTL).Err(); err != nil {
+				if err := s.redis.Set(
+					context.Background(),
+					"link:"+cacheID,
+					target,
+					cacheTTL,
+				).Err(); err != nil {
 					s.logger.Error("failed to refresh redis cache", "error", err)
 				}
 			}(id, row.OriginalURL, ttl)

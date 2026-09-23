@@ -36,7 +36,7 @@ func Load() (Config, error) {
 		SupabaseURL:       strings.TrimSpace(os.Getenv("SUPABASE_URL")),
 		SupabaseKey:       strings.TrimSpace(os.Getenv("SUPABASE_KEY")),
 		RedisURL:          strings.TrimSpace(os.Getenv("REDIS_URL")),
-		RedisMachineIDKey: getEnv("REDIS_MACHINE_ID_KEY", "makeitshort:node:registration:counter"),
+		getEnv("REDIS_MACHINE_ID_KEY", "linkforge:node:registration:counter"),
 	}
 
 	cacheTTLSeconds, err := getEnvInt("CACHE_TTL_SECONDS", 172800)

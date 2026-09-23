@@ -13,7 +13,7 @@ import (
 	"github.com/nedpals/supabase-go"
 	"github.com/redis/go-redis/v9"
 
-	"github.com/makeitshort/backend/internal/config"
+	"github.com/NayanGattani/linkforge/backend/internal/config"
 )
 
 type Server struct {

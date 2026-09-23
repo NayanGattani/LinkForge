@@ -8,11 +8,11 @@ import (
 	"syscall"
 
 	"github.com/joho/godotenv"
-	"github.com/makeitshort/backend/internal/config"
-	"github.com/makeitshort/backend/internal/logger"
-	"github.com/makeitshort/backend/internal/server"
-	"github.com/makeitshort/backend/internal/shortid"
-	"github.com/makeitshort/backend/internal/store"
+	"github.com/NayanGattani/linkforge/backend/internal/config"
+	"github.com/NayanGattani/linkforge/backend/internal/logger"
+	"github.com/NayanGattani/linkforge/backend/internal/server"
+	"github.com/NayanGattani/linkforge/backend/internal/shortid"
+	"github.com/NayanGattani/linkforge/backend/internal/store"
 )
 
 func main() {
