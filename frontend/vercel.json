@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/:id",
-      "destination": "https://make-it-short.onrender.com/:id"
+      "destination": "https://linkforge-api-i5n7.onrender.com/:id"
     }
   ]
 }
